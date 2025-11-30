@@ -117,6 +117,42 @@
       font-weight: 600;
     }
 
+    .word-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .sound {
+      border: none;
+      background: rgba(18, 181, 199, 0.14);
+      color: #0f3b4c;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      height: 46px;
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 160ms ease, background 120ms ease;
+      box-shadow: 0 10px 20px rgba(18, 181, 199, 0.18);
+    }
+
+    .sound:active { transform: translateY(1px); }
+
+    .sound svg { width: 22px; height: 22px; }
+
+    .sound.ping {
+      animation: ping 380ms ease;
+    }
+
+    @keyframes ping {
+      0% { transform: scale(0.98); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
     .hint {
       font-size: 15px;
       color: #123548;
@@ -194,13 +230,22 @@
   <div class="wrap">
     <header>
       <h1>Little Sight Words</h1>
-      <div class="pill" aria-live="polite">Tap or swipe for a new card</div>
+      <div class="pill" aria-live="polite">Tap or swipe for a new card — tap the speaker to hear it</div>
     </header>
 
     <div class="card" role="button" aria-label="Sight word card">
       <div class="card-content">
         <div class="eyebrow">Today&#8217;s word</div>
-        <div class="word" id="word">go</div>
+        <div class="word-row">
+          <div class="word" id="word">go</div>
+          <button class="sound" id="speak" aria-label="Play the word sound">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 5 6 9H3v6h3l5 4V5z"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              <path d="M19.07 4.93a9 9 0 0 1 0 14.14"/>
+            </svg>
+          </button>
+        </div>
         <p class="hint" id="phrase">Say it, trace it in the air, then clap once.</p>
       </div>
     </div>
@@ -294,8 +339,11 @@
     const cardEl = document.querySelector(".card");
     const nextBtn = document.getElementById("next");
     const shuffleBtn = document.getElementById("shuffle");
+    const speakBtn = document.getElementById("speak");
 
     let seen = new Set();
+    let voices = [];
+    const canSpeak = "speechSynthesis" in window && typeof SpeechSynthesisUtterance !== "undefined";
 
     const randomIndex = () => Math.floor(Math.random() * words.length);
 
@@ -354,6 +402,40 @@
           showWord();
         }
       });
+    }
+
+    function populateVoices() {
+      if (!canSpeak) return;
+      voices = speechSynthesis.getVoices().filter((v) => v.lang && v.lang.toLowerCase().startsWith("en"));
+      if (!voices.length) {
+        voices = speechSynthesis.getVoices();
+      }
+    }
+
+    function speakWord(text) {
+      if (!canSpeak) return;
+      populateVoices();
+      speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      const voice = voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("en-us")) || voices[0];
+      if (voice) utter.voice = voice;
+      utter.rate = 0.9;
+      utter.pitch = 1.05;
+      speechSynthesis.speak(utter);
+      speakBtn.classList.remove("ping");
+      void speakBtn.offsetWidth;
+      speakBtn.classList.add("ping");
+    }
+
+    if (canSpeak) {
+      populateVoices();
+      window.speechSynthesis.addEventListener("voiceschanged", populateVoices);
+      speakBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        speakWord(wordEl.textContent);
+      });
+    } else {
+      speakBtn.hidden = true;
     }
 
     nextBtn.addEventListener("click", showWord);
