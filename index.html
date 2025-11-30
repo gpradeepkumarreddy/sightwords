@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sight Word Cards</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #0b2436;
+      --bg-2: #0f3b4c;
+      --card: #f7fbff;
+      --text-1: #0d1b2a;
+      --accent-1: #12b5c7;
+      --accent-2: #f5a524;
+      --accent-3: #6dd3c8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--card);
+      background: radial-gradient(circle at 20% 20%, rgba(109, 211, 200, 0.12), transparent 30%),
+                  radial-gradient(circle at 80% 30%, rgba(18, 181, 199, 0.18), transparent 32%),
+                  linear-gradient(140deg, var(--bg-1), var(--bg-2));
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .wrap {
+      width: min(500px, 100%);
+      display: grid;
+      gap: 18px;
+    }
+
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    h1 {
+      font-size: clamp(26px, 5vw, 34px);
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+
+    .pill {
+      background: rgba(247, 251, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #d9f3ff;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+    }
+
+    .card {
+      position: relative;
+      background: var(--card);
+      color: var(--text-1);
+      border-radius: 18px;
+      padding: 24px 22px 26px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+    }
+
+    .card::before,
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: -10% auto auto -10%;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, rgba(18, 181, 199, 0.2), transparent 60%);
+      transform: rotate(12deg);
+    }
+
+    .card::after {
+      inset: auto -15% -20% auto;
+      background: radial-gradient(circle, rgba(245, 165, 36, 0.2), transparent 60%);
+      transform: rotate(-8deg);
+    }
+
+    .card-content {
+      position: relative;
+      display: grid;
+      gap: 10px;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #0f3b4c;
+      background: rgba(18, 181, 199, 0.12);
+      padding: 6px 10px;
+      border-radius: 999px;
+      width: fit-content;
+      letter-spacing: 0.2px;
+    }
+
+    .word {
+      font-size: clamp(64px, 18vw, 96px);
+      margin: 10px 0 6px;
+      letter-spacing: -1px;
+      line-height: 1;
+      font-weight: 600;
+    }
+
+    .hint {
+      font-size: 15px;
+      color: #123548;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .progress {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+      letter-spacing: 0.2px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 160ms ease, background 120ms ease;
+      color: #0f172a;
+      background: linear-gradient(135deg, #ffd166, #f59e0b);
+      box-shadow: 0 12px 28px rgba(245, 165, 36, 0.25);
+    }
+
+    .button:active {
+      transform: translateY(1px);
+      box-shadow: 0 8px 18px rgba(245, 165, 36, 0.35);
+    }
+
+    .ghost {
+      background: rgba(247, 251, 255, 0.12);
+      color: #e5f5ff;
+      border: 1px solid rgba(247, 251, 255, 0.2);
+      box-shadow: none;
+    }
+
+    .footnote {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .pulse {
+      animation: pulse 260ms ease;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.98); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    @media (max-width: 540px) {
+      body { padding: 16px; }
+      .actions { grid-template-columns: 1fr; }
+      .pill { font-size: 13px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Little Sight Words</h1>
+      <div class="pill" aria-live="polite">Tap or swipe for a new card</div>
+    </header>
+
+    <div class="card" role="button" aria-label="Sight word card">
+      <div class="card-content">
+        <div class="eyebrow">Today&#8217;s word</div>
+        <div class="word" id="word">go</div>
+        <p class="hint" id="phrase">Say it, trace it in the air, then clap once.</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="button" id="next">Show another word</button>
+      <button class="button ghost" id="shuffle">Shuffle deck</button>
+    </div>
+
+    <div class="progress" id="progress">0 / 0 cards seen</div>
+    <p class="footnote">Bonus: say the word, tap the card, and find it on something nearby. Swipe anywhere on the page to move on.</p>
+  </div>
+
+  <script>
+    const words = [
+      { text: "a", phrase: "I see a red ball." },
+      { text: "I", phrase: "I can jump." },
+      { text: "am", phrase: "I am happy." },
+      { text: "an", phrase: "An ant is tiny." },
+      { text: "at", phrase: "Look at the sun." },
+      { text: "as", phrase: "Hop as a frog." },
+      { text: "in", phrase: "In the box." },
+      { text: "it", phrase: "It is soft." },
+      { text: "is", phrase: "It is blue." },
+      { text: "if", phrase: "If you can, clap." },
+      { text: "up", phrase: "Reach up high." },
+      { text: "on", phrase: "Sit on the mat." },
+      { text: "no", phrase: "No, thank you." },
+      { text: "go", phrase: "Go, go, go!" },
+      { text: "to", phrase: "Walk to me." },
+      { text: "me", phrase: "Hug me, please." },
+      { text: "my", phrase: "My hat fits." },
+      { text: "we", phrase: "We can sing." },
+      { text: "be", phrase: "Be kind today." },
+      { text: "do", phrase: "Do a spin." },
+      { text: "did", phrase: "I did it!" },
+      { text: "see", phrase: "See the bird." },
+      { text: "you", phrase: "You are fast." },
+      { text: "the", phrase: "The cat naps." },
+      { text: "and", phrase: "Mom and dad." },
+      { text: "fun", phrase: "Fun in sand." },
+      { text: "run", phrase: "Run in place." },
+      { text: "can", phrase: "Can you hop?" },
+      { text: "off", phrase: "Step off the rug." },
+      { text: "all", phrase: "All done!" },
+      { text: "are", phrase: "You are tall." },
+      { text: "for", phrase: "This is for you." },
+      { text: "had", phrase: "I had a snack." },
+      { text: "has", phrase: "She has a toy." },
+      { text: "him", phrase: "Wave to him." },
+      { text: "his", phrase: "That is his hat." },
+      { text: "her", phrase: "Smile at her." },
+      { text: "but", phrase: "Small but strong." },
+      { text: "got", phrase: "I got it." },
+      { text: "get", phrase: "Can you get it?" },
+      { text: "out", phrase: "Step out slow." },
+      { text: "our", phrase: "Our turn now." },
+      { text: "put", phrase: "Put it here." },
+      { text: "now", phrase: "Do it now." },
+      { text: "new", phrase: "New book day." },
+      { text: "say", phrase: "Say it loud." },
+      { text: "she", phrase: "She can clap." },
+      { text: "who", phrase: "Who is that?" },
+      { text: "was", phrase: "It was fun." },
+      { text: "not", phrase: "Not yet." },
+      { text: "let", phrase: "Let us play." },
+      { text: "or", phrase: "This or that?" },
+      { text: "eat", phrase: "Eat the snack." },
+      { text: "play", phrase: "Play and smile." },
+      { text: "jump", phrase: "Jump three times." },
+      { text: "look", phrase: "Look at me." },
+      { text: "make", phrase: "Make a star." },
+      { text: "like", phrase: "I like you." },
+      { text: "come", phrase: "Come over here." },
+      { text: "here", phrase: "Here we go." },
+      { text: "this", phrase: "Touch this word." },
+      { text: "that", phrase: "Point to that." },
+      { text: "with", phrase: "Walk with me." },
+      { text: "what", phrase: "What is it?" },
+      { text: "when", phrase: "When is snack?" },
+      { text: "want", phrase: "I want a hug." },
+      { text: "then", phrase: "Sit then stand." },
+      { text: "them", phrase: "Sit with them." },
+      { text: "they", phrase: "They can help." },
+      { text: "from", phrase: "Gift from mom." }
+    ];
+
+    const wordEl = document.getElementById("word");
+    const phraseEl = document.getElementById("phrase");
+    const progressEl = document.getElementById("progress");
+    const cardEl = document.querySelector(".card");
+    const nextBtn = document.getElementById("next");
+    const shuffleBtn = document.getElementById("shuffle");
+
+    let seen = new Set();
+
+    const randomIndex = () => Math.floor(Math.random() * words.length);
+
+    function pickWord() {
+      if (seen.size === words.length) {
+        seen.clear();
+      }
+
+      let idx = randomIndex();
+      let safeGuard = 0;
+      while (seen.has(idx) && safeGuard < 10) {
+        idx = randomIndex();
+        safeGuard += 1;
+      }
+
+      seen.add(idx);
+      updateProgress();
+      return words[idx];
+    }
+
+    function updateProgress() {
+      progressEl.textContent = `${seen.size} / ${words.length} cards seen`;
+    }
+
+    function showWord() {
+      const pick = pickWord();
+      wordEl.textContent = pick.text;
+      phraseEl.textContent = pick.phrase;
+      cardEl.classList.remove("pulse");
+      // Force reflow so the animation can retrigger.
+      void cardEl.offsetWidth;
+      cardEl.classList.add("pulse");
+    }
+
+    function shuffleDeck() {
+      seen = new Set();
+      updateProgress();
+      showWord();
+    }
+
+    function setupSwipe() {
+      let startX = 0;
+      let startY = 0;
+
+      window.addEventListener("touchstart", (e) => {
+        const touch = e.changedTouches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+      });
+
+      window.addEventListener("touchend", (e) => {
+        const touch = e.changedTouches[0];
+        const dx = touch.clientX - startX;
+        const dy = touch.clientY - startY;
+        if (Math.abs(dx) > 40 && Math.abs(dy) < 60) {
+          showWord();
+        }
+      });
+    }
+
+    nextBtn.addEventListener("click", showWord);
+    shuffleBtn.addEventListener("click", shuffleDeck);
+    cardEl.addEventListener("click", showWord);
+
+    window.addEventListener("keydown", (e) => {
+      if ([" ", "ArrowRight", "ArrowLeft"].includes(e.key)) {
+        e.preventDefault();
+        showWord();
+      }
+    });
+
+    setupSwipe();
+    showWord();
+  </script>
+</body>
+</html>
