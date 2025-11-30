@@ -168,7 +168,7 @@
 
     .actions {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
       align-items: center;
     }
@@ -251,7 +251,8 @@
     </div>
 
     <div class="actions">
-      <button class="button" id="next">Show another word</button>
+      <button class="button ghost" id="prev">Back</button>
+      <button class="button" id="next">Next</button>
       <button class="button ghost" id="shuffle">Shuffle deck</button>
     </div>
 
@@ -340,16 +341,20 @@
     const nextBtn = document.getElementById("next");
     const shuffleBtn = document.getElementById("shuffle");
     const speakBtn = document.getElementById("speak");
+    const prevBtn = document.getElementById("prev");
 
     let seen = new Set();
     let voices = [];
+    let history = [];
+    let currentIdx = null;
     const canSpeak = "speechSynthesis" in window && typeof SpeechSynthesisUtterance !== "undefined";
 
     const randomIndex = () => Math.floor(Math.random() * words.length);
 
-    function pickWord() {
+    function pickWordIndex() {
       if (seen.size === words.length) {
         seen.clear();
+        history = [];
       }
 
       let idx = randomIndex();
@@ -361,15 +366,15 @@
 
       seen.add(idx);
       updateProgress();
-      return words[idx];
+      return idx;
     }
 
     function updateProgress() {
       progressEl.textContent = `${seen.size} / ${words.length} cards seen`;
     }
 
-    function showWord() {
-      const pick = pickWord();
+    function renderWord(idx) {
+      const pick = words[idx];
       wordEl.textContent = pick.text;
       phraseEl.textContent = pick.phrase;
       cardEl.classList.remove("pulse");
@@ -378,8 +383,32 @@
       cardEl.classList.add("pulse");
     }
 
+    function showWord() {
+      const idx = pickWordIndex();
+      currentIdx = idx;
+      history.push(idx);
+      renderWord(idx);
+      updateBackState();
+    }
+
+    function goBack() {
+      if (history.length <= 1) return;
+      history.pop();
+      const idx = history[history.length - 1];
+      currentIdx = idx;
+      renderWord(idx);
+      updateBackState();
+    }
+
+    function updateBackState() {
+      prevBtn.disabled = history.length <= 1;
+    }
+
     function shuffleDeck() {
       seen = new Set();
+      history = [];
+      currentIdx = null;
+      prevBtn.disabled = true;
       updateProgress();
       showWord();
     }
@@ -432,12 +461,15 @@
       window.speechSynthesis.addEventListener("voiceschanged", populateVoices);
       speakBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        speakWord(wordEl.textContent);
+        if (currentIdx !== null) {
+          speakWord(words[currentIdx].text);
+        }
       });
     } else {
       speakBtn.hidden = true;
     }
 
+    prevBtn.addEventListener("click", goBack);
     nextBtn.addEventListener("click", showWord);
     shuffleBtn.addEventListener("click", shuffleDeck);
     cardEl.addEventListener("click", showWord);
